@@ -13,13 +13,11 @@ export default function Navigation({ companyName, slug, className }: Props) {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 px-4 md:px-8 py-4',
-        'bg-background/80 backdrop-blur-xl border-b',
-        'transition-all duration-300',
+        'fixed top-0 w-full z-50 px-8 py-4 bg-background/80 backdrop-blur-xl shadow-sm transition-all duration-300',
         className
       )}
     >
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="flex justify-between items-center max-w-[1440px] mx-auto">
         {/* Logo */}
         <Link
           href={`/${slug}/careers`}
@@ -33,37 +31,39 @@ export default function Navigation({ companyName, slug, className }: Props) {
         <div className="hidden md:flex items-center space-x-8">
           <a
             href="#about"
-            className="nav-link text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
             Our Story
           </a>
           <a
             href="#life"
-            className="nav-link text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="font-body text-sm text-muted-foreground transition-colors hover:text-foreground"
           >
-            Life at {companyName}
+            Culture
           </a>
           <a
             href="#roles"
-            className="nav-link text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="font-body text-sm font-bold border-b-2 pb-1 transition-colors"
+            style={{ 
+              color: 'var(--company-primary)',
+              borderColor: 'var(--company-primary)'
+            }}
           >
             Open Roles
           </a>
         </div>
 
         {/* CTA */}
-        <div>
-          <Link
-            href="#roles"
-            className="btn-primary inline-block"
-            style={{
-              backgroundColor: 'var(--company-primary)',
-              color: 'var(--company-on-primary)',
-            }}
-          >
-            Join the Talent Pool
-          </Link>
-        </div>
+        <Link
+          href="#roles"
+          className="px-6 py-2.5 rounded-xl font-semibold transition-all hover:scale-105 duration-300 ease-out shadow-lg shadow-black/5"
+          style={{
+            backgroundColor: 'var(--company-primary)',
+            color: 'white',
+          }}
+        >
+          Join the Talent Pool
+        </Link>
       </div>
     </nav>
   )

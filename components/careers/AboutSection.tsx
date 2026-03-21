@@ -1,5 +1,8 @@
 'use client'
 
+import { motion } from 'framer-motion'
+import { Award, Code2, Users2 } from 'lucide-react'
+
 interface Props {
   title?: string
   content: string
@@ -14,11 +17,17 @@ export default function AboutSection({
   companyName,
 }: Props) {
   return (
-    <section id="about" className="py-20 md:py-32 px-4 md:px-12 max-w-7xl mx-auto">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24 items-center">
+    <section id="about" className="py-20 md:py-32 px-6 md:px-12 max-w-[1440px] mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 items-center">
         {/* Left side - Image with organic blob */}
-        <div className="relative">
-          {imageUrl && (
+        <motion.div 
+          initial={{ opacity: 0, x: -40 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          className="relative"
+        >
+          {imageUrl ? (
             <>
               {/* Organic blob accent */}
               <div
@@ -30,14 +39,22 @@ export default function AboutSection({
               <img
                 src={imageUrl}
                 alt={`${companyName} team`}
-                className="relative z-10 w-full rounded-[2rem] organic-shadow aspect-[4/5] object-cover"
+                className="relative z-10 w-full rounded-[3rem] organic-shadow aspect-[4/5] object-cover"
               />
             </>
+          ) : (
+            <div className="relative z-10 w-full rounded-[3rem] organic-shadow aspect-[4/5] bg-slate-100 flex items-center justify-center">
+              <span className="text-slate-400">Team Photo Placeholder</span>
+            </div>
           )}
 
           {/* Badge/Award */}
-          <div
-            className="absolute -bottom-6 -right-6 w-32 h-32 rounded-full organic-shadow flex items-center justify-center p-4 z-20"
+          <motion.div
+            initial={{ scale: 0, opacity: 0 }}
+            whileInView={{ scale: 1, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.5, type: 'spring', bounce: 0.5 }}
+            className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full organic-shadow flex items-center justify-center p-6 z-20"
             style={{ backgroundColor: 'var(--company-surface-container-lowest)' }}
           >
             <div className="text-center">
@@ -45,19 +62,27 @@ export default function AboutSection({
                 className="font-headline font-bold text-sm"
                 style={{ color: 'var(--company-primary)' }}
               >
-                Winner
+                Winner<br />
+                <span className="text-xs font-normal" style={{ color: 'var(--company-on-surface-variant)' }}>
+                  Culture & Design
+                </span>
               </p>
-              <p className="text-xs text-muted-foreground">Design Culture 2024</p>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Right side - Text content */}
-        <div className="space-y-8">
+        <motion.div 
+          initial={{ opacity: 0, x: 40 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="space-y-8"
+        >
           <span
-            className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase"
+            className="inline-block px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase font-label"
             style={{
-              backgroundColor: 'var(--company-secondary) + 30',
+              backgroundColor: 'rgba(0,0,0,0.05)',
               color: 'var(--company-secondary)',
             }}
           >
@@ -65,34 +90,51 @@ export default function AboutSection({
           </span>
 
           <h2
-            className="font-headline text-3xl md:text-5xl font-bold leading-tight"
-            style={{ color: 'var(--company-primary)' }}
+            className="font-headline text-4xl font-extrabold leading-tight"
+            style={{ color: 'var(--company-on-surface)' }}
           >
-            Building the Future of Work
+            The Craft Behind the Code
           </h2>
 
-          <div className="space-y-4 text-base md:text-lg" style={{ color: 'var(--company-on-surface)' }}>
-            {content.split('\n').map((paragraph, idx) => (
-              <p key={idx}>{paragraph}</p>
-            ))}
+          <div 
+            className="text-lg leading-relaxed whitespace-pre-wrap"
+            style={{ color: 'var(--company-on-surface-variant)' }}
+          >
+            {content || `At ${companyName}, we don't just ship features; we engineer experiences.`}
           </div>
 
-          {/* Stats or highlights */}
-          <div className="grid grid-cols-3 gap-6 pt-8 border-t" style={{ borderColor: 'var(--border)' }}>
-            <div>
-              <p className="text-3xl font-bold" style={{ color: 'var(--company-primary)' }}>150+</p>
-              <p className="text-sm text-muted-foreground">Team Members</p>
+          <div className="grid grid-cols-1 gap-6 pt-4">
+            <div className="flex gap-4 items-start">
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                style={{ backgroundColor: 'var(--company-primary)', opacity: 0.1 }}
+              >
+                <Users2 className="absolute text-primary w-6 h-6" style={{ color: 'var(--company-primary)' }} />
+              </div>
+              <div>
+                <h4 className="font-headline font-bold text-lg">Radical Intentionality</h4>
+                <p className="text-sm" style={{ color: 'var(--company-on-surface-variant)' }}>
+                  Every meeting has a purpose, every project has a soul, and every voice is heard.
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-3xl font-bold" style={{ color: 'var(--company-primary)' }}>12</p>
-              <p className="text-sm text-muted-foreground">Countries</p>
-            </div>
-            <div>
-              <p className="text-3xl font-bold" style={{ color: 'var(--company-primary)' }}>4.9</p>
-              <p className="text-sm text-muted-foreground">Glassdoor Rating</p>
+            
+            <div className="flex gap-4 items-start">
+              <div 
+                className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0"
+                style={{ backgroundColor: 'var(--company-secondary)', opacity: 0.1 }}
+              >
+                <Code2 className="absolute text-primary w-6 h-6" style={{ color: 'var(--company-secondary)' }} />
+              </div>
+              <div>
+                <h4 className="font-headline font-bold text-lg">Intellectual Autonomy</h4>
+                <p className="text-sm" style={{ color: 'var(--company-on-surface-variant)' }}>
+                  We hire experts to tell us what to do, not the other way around.
+                </p>
+              </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   )

@@ -5,34 +5,39 @@ import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Card } from '@/components/ui/card'
 import { updateCompanyTheme } from '@/lib/actions'
-import { Upload } from 'lucide-react'
 
 interface Props {
   companyId: string
+  onUpdate?: () => void
 }
 
-export default function ThemeCustomizer({ companyId }: Props) {
+export default function ThemeCustomizer({ companyId, onUpdate }: Props) {
+  const supabase = createClient()
+
   const [theme, setTheme] = useState<{
     primary_color: string
     secondary_color: string
     font_family: string
-    banner_url: string | null
-    logo_url: string | null
-    culture_video_url: string | null
   }>({
     primary_color: '#2563eb',
     secondary_color: '#64748b',
     font_family: 'Inter',
-    banner_url: null,
-    logo_url: null,
-    culture_video_url: null,
   })
+
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
-  const supabase = createClient()
+  const palettes = [
+    { name: 'Ocean', primary: '#2563eb', secondary: '#64748b' },
+    { name: 'Forest', primary: '#16a34a', secondary: '#475569' },
+    { name: 'Sunset', primary: '#ea580c', secondary: '#57534e' },
+    { name: 'Amethyst', primary: '#9333ea', secondary: '#52525b' },
+    { name: 'Midnight', primary: '#0f172a', secondary: '#64748b' },
+    { name: 'Crimson', primary: '#e11d48', secondary: '#71717a' },
+  ]
+
+  const fonts = ['Inter', 'Poppins', 'DM Sans', 'Syne', 'Space Grotesk', 'Outfit']
 
   useEffect(() => {
     fetchTheme()
@@ -50,9 +55,6 @@ export default function ThemeCustomizer({ companyId }: Props) {
         primary_color: data.primary_color || '#2563eb',
         secondary_color: data.secondary_color || '#64748b',
         font_family: data.font_family || 'Inter',
-        banner_url: data.banner_url,
-        logo_url: data.logo_url,
-        culture_video_url: data.culture_video_url,
       })
     }
   }
@@ -66,13 +68,11 @@ export default function ThemeCustomizer({ companyId }: Props) {
         primary_color: theme.primary_color,
         secondary_color: theme.secondary_color,
         font_family: theme.font_family,
-        banner_url: theme.banner_url,
-        logo_url: theme.logo_url,
-        culture_video_url: theme.culture_video_url,
       })
 
       if (result.success) {
         setMessage({ type: 'success', text: 'Theme saved successfully!' })
+        onUpdate?.()
       } else {
         setMessage({ type: 'error', text: 'Failed to save theme' })
       }
@@ -81,33 +81,6 @@ export default function ThemeCustomizer({ companyId }: Props) {
     } finally {
       setSaving(false)
     }
-  }
-
-  const handleFileUpload = async (
-    e: React.ChangeEvent<HTMLInputElement>,
-    field: 'banner_url' | 'logo_url' | 'culture_video_url'
-  ) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-
-    const fileExt = file.name.split('.').pop()
-    const fileName = `${companyId}/${field}.${fileExt}`
-    const filePath = `theme-assets/${fileName}`
-
-    const { error: uploadError } = await supabase.storage
-      .from('careers-assets')
-      .upload(filePath, file, { upsert: true })
-
-    if (uploadError) {
-      setMessage({ type: 'error', text: `Failed to upload ${field}` })
-      return
-    }
-
-    const { data: { publicUrl } } = supabase.storage
-      .from('careers-assets')
-      .getPublicUrl(filePath)
-
-    setTheme((prev) => ({ ...prev, [field]: publicUrl }))
   }
 
   return (
@@ -124,135 +97,94 @@ export default function ThemeCustomizer({ companyId }: Props) {
         </div>
       )}
 
-      {/* Colors */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="space-y-2">
-          <Label htmlFor="primaryColor">Primary Color</Label>
-          <div className="flex gap-2">
-            <Input
-              id="primaryColor"
-              type="color"
-              value={theme.primary_color}
-              onChange={(e) =>
-                setTheme((prev) => ({ ...prev, primary_color: e.target.value }))
-              }
-              className="w-16 h-10 p-1"
-            />
-            <Input
-              value={theme.primary_color}
-              onChange={(e) =>
-                setTheme((prev) => ({ ...prev, primary_color: e.target.value }))
-              }
-              placeholder="#2563eb"
-            />
-          </div>
+      {/* Curated Color Palettes */}
+      <div className="space-y-3">
+        <Label className="text-[#1b1b1f] font-semibold text-base">Color Palette</Label>
+        <div className="grid grid-cols-3 gap-3">
+          {palettes.map((p) => (
+            <button
+              key={p.name}
+              type="button"
+              onClick={() => setTheme((prev) => ({ ...prev, primary_color: p.primary, secondary_color: p.secondary }))}
+              className={`p-2 rounded-xl border flex flex-col gap-2 items-center transition-all ${
+                theme.primary_color === p.primary ? 'border-[#003083] ring-1 ring-[#003083] bg-blue-50/30' : 'border-[#c3c6d5] hover:border-gray-400 bg-white'
+              }`}
+            >
+              <div className="flex w-full h-10 rounded-lg overflow-hidden shadow-sm">
+                <div className="w-1/2 h-full" style={{ backgroundColor: p.primary }}></div>
+                <div className="w-1/2 h-full" style={{ backgroundColor: p.secondary }}></div>
+              </div>
+              <span className="text-xs font-semibold text-[#434653]">{p.name}</span>
+            </button>
+          ))}
         </div>
+      </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="secondaryColor">Secondary Color</Label>
-          <div className="flex gap-2">
-            <Input
-              id="secondaryColor"
-              type="color"
-              value={theme.secondary_color}
-              onChange={(e) =>
-                setTheme((prev) => ({ ...prev, secondary_color: e.target.value }))
-              }
-              className="w-16 h-10 p-1"
-            />
-            <Input
-              value={theme.secondary_color}
-              onChange={(e) =>
-                setTheme((prev) => ({ ...prev, secondary_color: e.target.value }))
-              }
-              placeholder="#64748b"
-            />
+      {/* Advanced Colors */}
+      <div className="space-y-4 pt-4 border-t border-[#c3c6d5]/20">
+        <Label className="text-[#434653] text-sm font-medium">Custom Exact Colors</Label>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <span className="text-xs text-[#757780]">Primary</span>
+            <div className="flex gap-2">
+              <Input
+                type="color"
+                value={theme.primary_color}
+                onChange={(e) => setTheme((prev) => ({ ...prev, primary_color: e.target.value }))}
+                className="w-12 h-10 p-1 cursor-pointer rounded-lg border-[#c3c6d5]"
+              />
+              <Input
+                value={theme.primary_color}
+                onChange={(e) => setTheme((prev) => ({ ...prev, primary_color: e.target.value }))}
+                className="font-mono text-sm"
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <span className="text-xs text-[#757780]">Secondary</span>
+            <div className="flex gap-2">
+              <Input
+                type="color"
+                value={theme.secondary_color}
+                onChange={(e) => setTheme((prev) => ({ ...prev, secondary_color: e.target.value }))}
+                className="w-12 h-10 p-1 cursor-pointer rounded-lg border-[#c3c6d5]"
+              />
+              <Input
+                value={theme.secondary_color}
+                onChange={(e) => setTheme((prev) => ({ ...prev, secondary_color: e.target.value }))}
+                className="font-mono text-sm"
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Font */}
-      <div className="space-y-2">
-        <Label htmlFor="fontFamily">Font Family</Label>
-        <Input
-          id="fontFamily"
-          value={theme.font_family}
-          onChange={(e) =>
-            setTheme((prev) => ({ ...prev, font_family: e.target.value }))
-          }
-          placeholder="Inter, Roboto, etc."
-        />
-      </div>
-
-      {/* File Uploads */}
-      <div className="space-y-4">
-        <Label>Brand Assets</Label>
-
-        {/* Banner */}
-        <Card className="p-4">
-          <div className="space-y-2">
-            <Label>Banner Image</Label>
-            <div className="flex items-center gap-4">
-              {theme.banner_url && (
-                <img
-                  src={theme.banner_url}
-                  alt="Banner"
-                  className="h-20 w-40 object-cover rounded"
-                />
-              )}
-              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50">
-                <Upload className="h-4 w-4" />
-                <span>Upload Banner</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleFileUpload(e, 'banner_url')}
-                />
-              </label>
-            </div>
-          </div>
-        </Card>
-
-        {/* Logo */}
-        <Card className="p-4">
-          <div className="space-y-2">
-            <Label>Company Logo</Label>
-            <div className="flex items-center gap-4">
-              {theme.logo_url && (
-                <img
-                  src={theme.logo_url}
-                  alt="Logo"
-                  className="h-20 w-40 object-contain rounded"
-                />
-              )}
-              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border rounded-md hover:bg-gray-50">
-                <Upload className="h-4 w-4" />
-                <span>Upload Logo</span>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleFileUpload(e, 'logo_url')}
-                />
-              </label>
-            </div>
-          </div>
-        </Card>
-
-        {/* Culture Video */}
-        <Card className="p-4">
-          <div className="space-y-2">
-            <Label>Culture Video (YouTube/Vimeo URL)</Label>
-            <Input
-              value={theme.culture_video_url || ''}
-              onChange={(e) =>
-                setTheme((prev) => ({ ...prev, culture_video_url: e.target.value }))
-              }
-              placeholder="https://youtube.com/embed/..."
-            />
-          </div>
-        </Card>
+      {/* Font Family Selection */}
+      <div className="space-y-3 pt-6 border-t border-[#c3c6d5]/20">
+        <Label className="text-[#1b1b1f] font-semibold text-base">Typography</Label>
+        <div className="grid grid-cols-2 gap-3">
+          {fonts.map((f) => (
+            <button
+              key={f}
+              type="button"
+              onClick={() => setTheme((prev) => ({ ...prev, font_family: f }))}
+              className={`py-3 px-4 rounded-xl border text-sm transition-all focus:outline-none ${
+                theme.font_family === f ? 'border-[#003083] bg-[#003083]/5 text-[#003083] font-bold shadow-sm' : 'border-[#c3c6d5] hover:bg-[#f6f2f8] bg-white text-[#434653]'
+              }`}
+              style={{ fontFamily: f }}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+        <div className="pt-2">
+          <Input
+            value={theme.font_family}
+            onChange={(e) => setTheme((prev) => ({ ...prev, font_family: e.target.value }))}
+            placeholder="Custom font name (e.g. Roboto)"
+            className="text-sm font-mono mt-2"
+          />
+        </div>
       </div>
 
       <Button onClick={handleSave} disabled={saving} className="w-full">

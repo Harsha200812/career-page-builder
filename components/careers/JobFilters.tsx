@@ -1,14 +1,8 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { Button, buttonVariants } from '@/components/ui/button'
+import { useMemo, useState, useEffect } from 'react'
+import { motion } from 'framer-motion'
 import { Input } from '@/components/ui/input'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
 import {
   Select,
   SelectContent,
@@ -19,7 +13,6 @@ import {
 import { Search, FilterX } from 'lucide-react'
 import { Job } from '@/lib/types'
 import JobCard from './JobCard'
-import { cn } from '@/lib/utils'
 
 interface Props {
   initialJobs: Job[]
@@ -59,6 +52,13 @@ export default function JobFilters({ initialJobs }: Props) {
     })
   }, [initialJobs, filters])
 
+  const [visibleCount, setVisibleCount] = useState(10)
+
+  // Reset pagination when filters change
+  useEffect(() => {
+    setVisibleCount(10)
+  }, [filters])
+
   const hasActiveFilters = filters.search || filters.location || filters.jobType
 
   const clearFilters = () => {
@@ -66,111 +66,132 @@ export default function JobFilters({ initialJobs }: Props) {
   }
 
   return (
-    <div className="space-y-4">
-      {/* Filter controls */}
-      <div className="flex flex-col sm:flex-row gap-4">
+    <div className="space-y-8 max-w-[1000px] mx-auto">
+      {/* Search and Filters */}
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95 }}
+        whileInView={{ opacity: 1, scale: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.5 }}
+        className="glass-card rounded-[2rem] p-6 shadow-sm flex flex-col md:flex-row gap-4 items-center organic-shadow"
+      >
         {/* Search */}
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="flex-1 relative w-full">
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5" style={{ color: 'var(--company-on-surface-variant)' }} />
           <Input
             placeholder="Search by job title..."
             value={filters.search}
             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-            className="pl-10"
+            className="pl-12 py-6 rounded-2xl bg-white/50 border-none font-medium outline-none focus-visible:ring-1"
+            style={{ 
+              color: 'var(--company-on-surface)',
+              ['--tw-ring-color' as any]: 'var(--company-primary)' 
+            }}
           />
         </div>
 
-        {/* Location Select */}
-        <Select
-          value={filters.location}
-          onValueChange={(value: string | null) => {
-            if (value === null) return
-            setFilters(prev => ({ ...prev, location: value }))
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="All Locations" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="*">All Locations</SelectItem>
-            {locations.map(loc => (
-              <SelectItem key={loc} value={loc}>
-                {loc}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Job Type Select */}
-        <Select
-          value={filters.jobType}
-          onValueChange={(value: string | null) => {
-            if (value === null) return
-            setFilters(prev => ({ ...prev, jobType: value }))
-          }}
-        >
-          <SelectTrigger className="w-full sm:w-[200px]">
-            <SelectValue placeholder="All Types" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="*">All Types</SelectItem>
-            {jobTypes.map(type => (
-              <SelectItem key={type} value={type}>
-                {type}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-
-        {/* Clear Filters */}
-        {hasActiveFilters && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={clearFilters}
-            title="Clear filters"
+        {/* Filters */}
+        <div className="flex w-full md:w-auto gap-4">
+          <Select
+            value={filters.location}
+            onValueChange={(value: string | null) => {
+              if (value === null) return
+              setFilters(prev => ({ ...prev, location: value }))
+            }}
           >
-            <FilterX className="h-4 w-4" />
-          </Button>
-        )}
-      </div>
+            <SelectTrigger className="w-full md:w-[180px] py-6 rounded-2xl border-none bg-white/50 font-medium font-label backdrop-blur-md">
+              <SelectValue placeholder="All Locations" />
+            </SelectTrigger>
+            <SelectContent className="rounded-2xl">
+              <SelectItem value="*">All Locations</SelectItem>
+              {locations.map(loc => (
+                <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-      {/* Active filters display */}
-      {hasActiveFilters && (
-        <div className="flex flex-wrap gap-2">
-          {filters.search && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">
-              Search: {filters.search}
-            </span>
-          )}
-          {filters.location && filters.location !== '*' && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-              Location: {filters.location}
-            </span>
-          )}
-          {filters.jobType && filters.jobType !== '*' && (
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm">
-              Type: {filters.jobType}
-            </span>
+          {/* Job Type Select */}
+          <Select
+            value={filters.jobType}
+            onValueChange={(value: string | null) => {
+              if (value === null) return
+              setFilters(prev => ({ ...prev, jobType: value }))
+            }}
+          >
+            <SelectTrigger className="w-full md:w-[150px] py-6 rounded-2xl border-none bg-white/50 font-medium font-label backdrop-blur-md">
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent className="rounded-2xl">
+              <SelectItem value="*">All Types</SelectItem>
+              {jobTypes.map(type => (
+                <SelectItem key={type} value={type}>{type}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          
+          {hasActiveFilters && (
+            <button
+              onClick={clearFilters}
+              className="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-100 transition-colors"
+              title="Clear filters"
+            >
+              <FilterX className="h-5 w-5" />
+            </button>
           )}
         </div>
-      )}
+      </motion.div>
 
-      {/* Job count */}
-      <p className="text-sm text-muted-foreground">
-        Showing {filteredJobs.length} of {initialJobs.length} position{initialJobs.length !== 1 ? 's' : ''}
-      </p>
+      {/* Active filters display */}
+      <div className="flex justify-between items-center px-2">
+        <p className="font-semibold text-sm" style={{ color: 'var(--company-on-surface-variant)' }}>
+          Showing {filteredJobs.length} position{filteredJobs.length !== 1 ? 's' : ''}
+        </p>
+      </div>
 
       {/* Job List */}
-      <div className="mt-6 space-y-4">
+      <motion.div layout className="mt-8 space-y-4">
         {filteredJobs.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">No jobs match your filters.</p>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-20 rounded-[2rem] border-2 border-dashed border-slate-200"
+          >
+            <p className="text-lg font-medium" style={{ color: 'var(--company-on-surface-variant)' }}>
+              No roles match your search.
+            </p>
+          </motion.div>
         ) : (
-          filteredJobs.map(job => <JobCard key={job.id} job={job} />)
+          <>
+            {filteredJobs.slice(0, visibleCount).map((job, index) => (
+              <motion.div
+                layout
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.05 }}
+                key={job.id}
+              >
+                <JobCard job={job} />
+              </motion.div>
+            ))}
+            
+            {visibleCount < filteredJobs.length && (
+              <motion.div layout className="flex justify-center pt-8">
+                <button
+                  onClick={() => setVisibleCount(prev => prev + 10)}
+                  className="px-8 py-3 rounded-xl font-bold transition-all text-sm"
+                  style={{ 
+                    backgroundColor: 'rgba(0,0,0,0.05)',
+                    color: 'var(--company-on-surface-variant)'
+                  }}
+                >
+                  Show More Roles
+                </button>
+              </motion.div>
+            )}
+          </>
         )}
-      </div>
+      </motion.div>
     </div>
   )
 }

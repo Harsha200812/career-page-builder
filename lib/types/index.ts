@@ -16,6 +16,8 @@ export interface CompanyTheme {
   banner_url: string | null
   logo_url: string | null
   culture_video_url: string | null
+  hero_title: string | null
+  hero_subtitle: string | null
 }
 
 export interface CompanySection {

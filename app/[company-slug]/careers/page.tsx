@@ -86,15 +86,18 @@ export default async function CareersPage({ params }: PageProps) {
   const bannerUrl = theme?.banner_url
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={{
+      '--company-primary': primaryColor,
+      '--company-secondary': secondaryColor,
+    } as React.CSSProperties}>
       {/* Navigation */}
       <Navigation companyName={company.name} slug={slug} />
 
       {/* Hero Section */}
       <HeroSection
         companyName={company.name}
-        tagline={`Careers at ${company.name}`}
-        description={company.description || ''}
+        tagline={theme?.hero_title || `Careers at ${company.name}`}
+        description={theme?.hero_subtitle || company.description || ''}
         logoUrl={logoUrl}
         bannerUrl={bannerUrl}
         onPrimaryColor={primaryColor}
@@ -104,7 +107,7 @@ export default async function CareersPage({ params }: PageProps) {
       {/* About Section - either from sections or company description */}
       {sections?.find(s => s.type === 'about') ? (
         sections.filter(s => s.type === 'about').map(section => (
-          <ContentSection key={section.id} section={section} />
+          <ContentSection key={section.id} section={section} companyName={company.name} />
         ))
       ) : (
         company.description && (
@@ -118,43 +121,66 @@ export default async function CareersPage({ params }: PageProps) {
       )}
 
       {/* Life/Culture Section */}
-      {sections?.find(s => s.type === 'life') && (
-        <LifeSection
-          companyName={company.name}
-          title="Life at Company"
-          description="A glimpse into our workplace culture"
-          images={
-            (sections.find(s => s.type === 'life')?.content.images as string[])?.map(url => ({ url, alt: company.name })) || []
-          }
-        />
+      {sections?.find(s => s.type === 'life') && (() => {
+        const lifeSection = sections.find(s => s.type === 'life')!
+        return (
+          <LifeSection
+            companyName={company.name}
+            title={lifeSection.title || 'Life at Company'}
+            description={lifeSection.content?.description || 'A glimpse into our workplace culture'}
+            images={
+              Array.isArray(lifeSection.content?.images)
+                ? lifeSection.content.images.map((url: string) => ({ url, alt: company.name }))
+                : []
+            }
+          />
+        )
+      })()}
+
+      {/* Culture Video */}
+      {theme?.culture_video_url && (
+        <section className="py-20 px-6 md:px-12 max-w-[1000px] mx-auto">
+          <div className="text-center mb-12">
+            <h2 className="font-headline text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--company-on-surface)' }}>
+              Inside {company.name}
+            </h2>
+          </div>
+          <div className="aspect-video w-full rounded-[2.5rem] overflow-hidden shadow-2xl border border-black/5 bg-black/5">
+            <iframe 
+              src={theme.culture_video_url} 
+              className="w-full h-full border-none" 
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+              allowFullScreen
+              title="Culture Video"
+            />
+          </div>
+        </section>
       )}
 
       {/* Other sections (values, benefits, custom) */}
-      {sections?.filter(s => !['about', 'life'].includes(s.type)).map(section => (
-        <ContentSection key={section.id} section={section} />
+      {sections?.filter(s => 
+        !['about', 'life'].includes(s.type) && 
+        !(s.type === 'custom' && s.title === 'Footer')
+      ).map(section => (
+        <ContentSection key={section.id} section={section} companyName={company.name} />
       ))}
 
-      {/* Job Listings */}
-      <section id="roles" className="py-20 md:py-32 px-4 md:px-12 max-w-5xl mx-auto">
-        <div className="text-center mb-12">
+      {/* Job Listings h2 and filters */}
+      <section id="roles" className="py-20 md:py-32 px-6 md:px-12 max-w-[1000px] mx-auto">
+        <div className="text-center mb-16 md:mb-20">
           <span
             className="inline-block px-4 py-1.5 mb-4 rounded-full text-xs font-bold tracking-widest uppercase"
             style={{
-              backgroundColor: 'var(--company-secondary) + 30',
+              backgroundColor: 'rgba(0, 0, 0, 0.05)',
               color: 'var(--company-secondary)',
             }}
           >
             Open Positions
           </span>
-
-          <h2
-            className="font-headline text-3xl md:text-5xl font-bold mb-4"
-            style={{ color: 'var(--company-primary)' }}
-          >
-            Join Our Team
+          <h2 className="font-headline text-4xl md:text-5xl font-extrabold mb-4" style={{ color: 'var(--company-on-surface)' }}>
+            Open Roles
           </h2>
-
-          <p className="max-w-2xl mx-auto text-muted-foreground">
+          <p className="max-w-2xl mx-auto text-lg" style={{ color: 'var(--company-on-surface-variant)' }}>
             Find your next opportunity and help us build the future.
           </p>
         </div>
@@ -164,7 +190,10 @@ export default async function CareersPage({ params }: PageProps) {
       </section>
 
       {/* Footer */}
-      <Footer companyName={company.name} />
+      <Footer 
+        companyName={company.name} 
+        data={sections?.find(s => s.type === 'custom' && s.title === 'Footer')?.content} 
+      />
     </div>
   )
 }
