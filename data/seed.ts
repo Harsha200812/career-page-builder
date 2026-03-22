@@ -23,8 +23,6 @@ if (!supabaseServiceRoleKey) {
 
 const supabase = createClient(supabaseUrl, supabaseServiceRoleKey)
 
-const supabase = createClient(supabaseUrl, supabaseKey)
-
 async function seed() {
   console.log('🌱 Starting database seed...')
 

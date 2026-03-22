@@ -16,6 +16,8 @@ export interface CompanyTheme {
   banner_url: string | null
   logo_url: string | null
   culture_video_url: string | null
+  hero_title: string | null
+  hero_subtitle: string | null
 }
 
 export interface CompanySection {
@@ -34,15 +36,19 @@ export interface Job {
   title: string
   location: string
   department: string
-  work_policy: 'Remote' | 'Hybrid' | 'On-site'
+  work_policy: 'Remote' | 'Hybrid' | 'On-site' | string
   employment_type: string
   experience_level: string
   job_type: string
   salary_range: string | null
+  description: string | null
+  requirements: string | null
   slug: string
   posted_at: string
+  updated_at?: string | null
   is_active: boolean
 }
+
 
 export interface CompanyWithDetails extends Company {
   themes: CompanyTheme | null

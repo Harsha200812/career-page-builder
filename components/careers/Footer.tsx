@@ -5,47 +5,56 @@ import { cn } from '@/lib/utils'
 interface Props {
   companyName: string
   className?: string
+  data?: {
+    description?: string
+    email?: string
+    linkedin?: string
+    twitter?: string
+  }
 }
 
-export default function Footer({ companyName, className }: Props) {
+export default function Footer({ companyName, className, data }: Props) {
   const currentYear = new Date().getFullYear()
+
+  // Use dynamic description if provided, fallback to the old default
+  const description = data?.description || "Defining the next generation of professional agility. Join a team where your craft is respected, your boundaries are honored, and your impact is tangible."
 
   return (
     <footer
-      className={cn('py-12 border-t', className)}
-      style={{ backgroundColor: 'var(--company-surface)' }}
+      className={cn('pt-20 pb-12 border-t', className)}
+      style={{ backgroundColor: 'var(--company-surface)', borderColor: 'rgba(0,0,0,0.05)' }}
     >
-      <div className="max-w-7xl mx-auto px-4 md:px-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           {/* Company info */}
           <div className="md:col-span-2">
             <h3
-              className="text-2xl font-black tracking-tight mb-4"
+              className="text-2xl font-black tracking-tight mb-6"
               style={{ color: 'var(--company-primary)' }}
             >
               {companyName}
             </h3>
-            <p className="max-w-md text-muted-foreground">
-              We're defining the next generation of professional agility. Join us and be part of something extraordinary.
+            <p className="max-w-sm text-lg leading-relaxed whitespace-pre-wrap" style={{ color: 'var(--company-on-surface-variant)' }}>
+              {description}
             </p>
           </div>
 
           {/* Quick links */}
           <div>
-            <h4 className="font-semibold mb-4" style={{ color: 'var(--company-primary)' }}>Quick Links</h4>
-            <ul className="space-y-2">
+            <h4 className="font-bold mb-6 font-headline tracking-wide uppercase text-sm" style={{ color: 'var(--company-on-surface)' }}>Platform</h4>
+            <ul className="space-y-4">
               <li>
-                <a href="#about" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="#about" className="font-medium transition-colors hover:text-black" style={{ color: 'var(--company-on-surface-variant)' }}>
                   Our Story
                 </a>
               </li>
               <li>
-                <a href="#life" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-                  Life at {companyName}
+                <a href="#life" className="font-medium transition-colors hover:text-black" style={{ color: 'var(--company-on-surface-variant)' }}>
+                  Culture
                 </a>
               </li>
               <li>
-                <a href="#roles" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                <a href="#roles" className="font-medium transition-colors hover:text-black" style={{ color: 'var(--company-on-surface-variant)' }}>
                   Open Roles
                 </a>
               </li>
@@ -54,11 +63,37 @@ export default function Footer({ companyName, className }: Props) {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4" style={{ color: 'var(--company-primary)' }}>Connect</h4>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>hello@{companyName.toLowerCase().replace(/\s/g, '')}.com</li>
-              <li>+1 (555) 123-4567</li>
-              <li>San Francisco, CA</li>
+            <h4 className="font-bold mb-6 font-headline tracking-wide uppercase text-sm" style={{ color: 'var(--company-on-surface)' }}>Connect</h4>
+            <ul className="space-y-4 font-medium" style={{ color: 'var(--company-on-surface-variant)' }}>
+              {data?.email ? (
+                <li>
+                  <a href={`mailto:${data.email}`} className="hover:text-black transition-colors">
+                    {data.email}
+                  </a>
+                </li>
+              ) : (
+                <li className="hover:text-black transition-colors cursor-pointer">hello@{companyName.toLowerCase().replace(/\s/g, '')}.com</li>
+              )}
+              
+              {data?.linkedin ? (
+                <li>
+                  <a href={data.linkedin} target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">
+                    LinkedIn
+                  </a>
+                </li>
+              ) : (
+                <li className="hover:text-black transition-colors cursor-pointer">LinkedIn</li>
+              )}
+
+              {data?.twitter ? (
+                <li>
+                  <a href={data.twitter} target="_blank" rel="noopener noreferrer" className="hover:text-black transition-colors">
+                    Twitter / X
+                  </a>
+                </li>
+              ) : (
+                <li className="hover:text-black transition-colors cursor-pointer">Twitter / X</li>
+              )}
             </ul>
           </div>
         </div>
@@ -66,17 +101,17 @@ export default function Footer({ companyName, className }: Props) {
         {/* Bottom */}
         <div
           className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4"
-          style={{ borderColor: 'var(--border)' }}
+          style={{ borderColor: 'rgba(0,0,0,0.05)' }}
         >
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm font-medium" style={{ color: 'var(--company-on-surface-variant)' }}>
             © {currentYear} {companyName}. All rights reserved.
           </p>
 
-          <div className="flex gap-6">
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
+          <div className="flex gap-8">
+            <a href="#" className="text-sm font-medium hover:text-black transition-colors" style={{ color: 'var(--company-on-surface-variant)' }}>
               Privacy Policy
             </a>
-            <a href="#" className="text-sm text-muted-foreground hover:text-foreground">
+            <a href="#" className="text-sm font-medium hover:text-black transition-colors" style={{ color: 'var(--company-on-surface-variant)' }}>
               Terms of Service
             </a>
           </div>

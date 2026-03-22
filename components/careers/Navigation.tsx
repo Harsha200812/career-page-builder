@@ -13,57 +13,70 @@ export default function Navigation({ companyName, slug, className }: Props) {
   return (
     <nav
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 px-4 md:px-8 py-4',
-        'bg-background/80 backdrop-blur-xl border-b',
-        'transition-all duration-300',
+        'fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200/50 shadow-sm transition-all duration-300',
         className
       )}
     >
-      <div className="max-w-7xl mx-auto flex justify-between items-center">
+      <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link
           href={`/${slug}/careers`}
-          className="text-2xl font-black tracking-tight"
+          className="text-2xl font-bold tracking-tight hover:opacity-80 transition-opacity"
           style={{ color: 'var(--company-primary)' }}
         >
           {companyName}
         </Link>
 
         {/* Desktop Navigation */}
-        <div className="hidden md:flex items-center space-x-8">
+        <div className="hidden md:flex items-center gap-8">
           <a
             href="#about"
-            className="nav-link text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
           >
             Our Story
           </a>
           <a
             href="#life"
-            className="nav-link text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
           >
-            Life at {companyName}
+            Culture
           </a>
           <a
-            href="#roles"
-            className="nav-link text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+            href="#values"
+            className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors"
+          >
+            Values
+          </a>
+          <a
+            href="#openings"
+            className="text-sm font-bold px-4 py-2 rounded-lg"
+            style={{
+              color: 'var(--company-primary)',
+              backgroundColor: 'var(--company-primary)10'
+            }}
           >
             Open Roles
           </a>
         </div>
 
         {/* CTA */}
-        <div>
-          <Link
-            href="#roles"
-            className="btn-primary inline-block"
-            style={{
-              backgroundColor: 'var(--company-primary)',
-              color: 'var(--company-on-primary)',
-            }}
-          >
-            Join the Talent Pool
-          </Link>
-        </div>
+        <Link
+          href="#openings"
+          className="hidden md:inline-flex px-6 py-2.5 rounded-xl font-semibold transition-all hover:-translate-y-0.5 shadow-lg hover:shadow-xl"
+          style={{
+            backgroundColor: 'var(--company-primary)',
+            color: 'white',
+          }}
+        >
+          View Positions
+        </Link>
+
+        {/* Mobile menu button */}
+        <button className="md:hidden p-2 rounded-lg hover:bg-slate-100">
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
       </div>
     </nav>
   )

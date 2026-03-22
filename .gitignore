@@ -36,6 +36,23 @@ next-env.d.ts
 # IDE
 .vscode
 .idea
-
+.claude
+.agent
 # Supabase
 .supabase
+
+# Docs
+docs
+
+# AI Tools and Agents
+.cursor
+.aider*
+.gemini
+_agents/
+.bolt
+
+# Secrets & Local DB
+*.sqlite
+*.sqlite3
+*.db
+supabase/.temp/

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Careers Page Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-tertiary-fixed": "#00201a",
+                "tertiary-fixed": "#26fedc",
+                "surface-container": "#f0edf2",
+                "surface-container-low": "#f6f2f8",
+                "on-tertiary-fixed-variant": "#005144",
+                "tertiary-fixed-dim": "#00dfc1",
+                "on-secondary-fixed": "#001f27",
+                "secondary-container": "#50d9fe",
+                "on-surface-variant": "#434653",
+                "on-error": "#ffffff",
+                "error-container": "#ffdad6",
+                "on-primary": "#ffffff",
+                "tertiary": "#003f35",
+                "surface-container-high": "#eae7ed",
+                "surface-container-lowest": "#ffffff",
+                "on-secondary-fixed-variant": "#004e5f",
+                "secondary-fixed-dim": "#4cd6fb",
+                "primary-fixed": "#dbe1ff",
+                "on-tertiary": "#ffffff",
+                "on-tertiary-container": "#00d6b9",
+                "primary-fixed-dim": "#b3c5ff",
+                "primary": "#003083",
+                "secondary-fixed": "#b3ebff",
+                "on-primary-container": "#a8bcff",
+                "error": "#ba1a1a",
+                "outline": "#737784",
+                "on-surface": "#1b1b1f",
+                "on-primary-fixed-variant": "#003ea6",
+                "surface-dim": "#dcd9de",
+                "secondary": "#00677d",
+                "on-primary-fixed": "#00184a",
+                "on-secondary": "#ffffff",
+                "on-error-container": "#93000a",
+                "surface-variant": "#e4e1e7",
+                "surface-tint": "#0754d6",
+                "on-secondary-container": "#005c70",
+                "tertiary-container": "#00584b",
+                "inverse-surface": "#303034",
+                "background": "#fbf8fe",
+                "surface-bright": "#fbf8fe",
+                "primary-container": "#0044b4",
+                "inverse-on-surface": "#f3f0f5",
+                "on-background": "#1b1b1f",
+                "surface": "#fbf8fe",
+                "surface-container-highest": "#e4e1e7",
+                "inverse-primary": "#b3c5ff",
+                "outline-variant": "#c3c6d5"
+              },
+              fontFamily: {
+                "headline": ["Manrope", "sans-serif"],
+                "body": ["Inter", "sans-serif"],
+                "label": ["Inter", "sans-serif"]
+              },
+              borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "0.75rem"},
+            },
+          },
+        }
+    </script>
+<style type="text/tailwindcss">
+        #side-panel-toggle:checked ~ #editor-overlay {
+            transform: translateX(0);
+        }
+        #side-panel-toggle:checked ~ label[for="side-panel-toggle"] {
+            right: 400px;
+        }
+        #side-panel-toggle:checked ~ label[for="side-panel-toggle"] .toggle-icon {
+            transform: rotate(180deg);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: rgba(115, 119, 132, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen flex overflow-hidden">
+<div class="relative flex h-screen w-64 flex-col bg-surface-container-low group/design-root overflow-x-hidden border-r border-outline-variant/15 flex-shrink-0 z-50">
+<div class="layout-container flex h-full grow flex-col">
+<div class="flex flex-1 justify-center py-5 px-4">
+<div class="layout-content-container flex flex-col w-full flex-1">
+<div class="flex h-full flex-col justify-between">
+<div class="flex flex-col gap-8">
+<div class="flex gap-3 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 shadow-[0_4px_12px_rgba(27,27,31,0.06)]" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCcdB1I1k48Avj9KjELP-r9DeRN-l5D2rf9M_CGkRtd73b_IaRPxH3IHLyeQvAvzY893Up1ehQutm7phTd2LLkJHZq2lH6puPqZ-hdOH3ckCWf8Z7_Jt03KjnucFErIY0uHV77KsIZgaE0whz3XjoL1MeoqTFYUJrQp3WF971vKHohTVcUcb3g99Xsds0uYZ9zHw2maLAn06z3t_UtgxHkRs4NYfKynbcg3ulEWREucDGFO2DA1DTBwrVcr2z7Lf-etTGfWVgAZsuc");'></div>
+<div class="flex flex-col">
+<h1 class="text-on-surface font-headline font-semibold text-lg leading-tight">Acme Corp</h1>
+<p class="text-on-surface-variant text-sm font-body">Recruiter Portal</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">mobile_layout</span>
+<span class="text-on-surface text-sm font-medium font-body">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">briefcase_meal</span>
+<span class="text-on-surface text-sm font-medium font-body">Jobs</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">group</span>
+<span class="text-on-surface text-sm font-medium font-body">Candidates</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-surface-container-high text-on-surface shadow-[0_4px_12px_rgba(27,27,31,0.04)]" href="#">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">view_quilt</span>
+<span class="text-on-surface text-sm font-semibold font-body">Careers Page</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">settings</span>
+<span class="text-on-surface text-sm font-medium font-body">Settings</span>
+</a>
+</nav>
+</div>
+<div class="flex flex-col gap-2 mt-8">
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">help</span>
+<span class="text-on-surface text-sm font-medium font-body">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-surface-container transition-colors" href="#">
+<span class="material-symbols-outlined text-on-surface-variant">logout</span>
+<span class="text-on-surface text-sm font-medium font-body">Log Out</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<main class="flex-1 flex flex-col bg-surface relative overflow-hidden h-screen">
+<div class="absolute top-[-10%] left-[-5%] w-[40%] h-[40%] bg-secondary-fixed opacity-40 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="absolute bottom-[-10%] right-[-5%] w-[50%] h-[50%] bg-primary-fixed opacity-30 rounded-full blur-[120px] pointer-events-none"></div>
+<header class="flex justify-between items-center px-12 py-6 border-b border-outline-variant/15 bg-surface/80 backdrop-blur-md absolute top-0 left-0 right-0 z-40">
+<div class="flex flex-col gap-1">
+<h2 class="text-on-surface font-headline font-bold text-[32px] tracking-tight">Careers Page Editor</h2>
+<p class="text-on-surface-variant text-sm font-body">Customize your organic layers careers page</p>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-2.5 rounded-lg bg-surface-container-high text-on-surface font-medium text-sm hover:bg-surface-container-highest transition-colors font-body shadow-[0_4px_12px_rgba(27,27,31,0.06)]">
+                    Save Draft
+                </button>
+<button class="px-6 py-2.5 rounded-lg bg-gradient-to-r from-primary to-primary-container text-on-primary font-medium text-sm hover:opacity-90 transition-opacity font-body shadow-[0_8px_24px_rgba(0,48,131,0.2)]">
+                    Publish Changes
+                </button>
+</div>
+</header>
+<div class="w-full h-full pt-28 pb-4 px-4 overflow-hidden">
+<div class="w-full h-full bg-surface-container-low rounded-t-2xl ring-1 ring-outline-variant/20 shadow-[0_24px_60px_rgba(27,27,31,0.08)] overflow-hidden flex flex-col">
+<div class="bg-surface-container h-12 flex items-center px-4 gap-3 border-b border-outline-variant/15">
+<div class="flex gap-1.5">
+<div class="w-3 h-3 rounded-full bg-outline-variant/50"></div>
+<div class="w-3 h-3 rounded-full bg-outline-variant/50"></div>
+<div class="w-3 h-3 rounded-full bg-outline-variant/50"></div>
+</div>
+<div class="flex-1 flex justify-center">
+<div class="bg-surface-container-highest px-6 py-1.5 rounded-full text-xs font-body text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+                            careers.acmecorp.com
+                        </div>
+</div>
+<div class="w-12"></div>
+</div>
+<div class="flex-1 overflow-y-auto bg-surface relative custom-scrollbar">
+<div class="p-8 pb-24 max-w-6xl mx-auto flex flex-col gap-16">
+<div class="relative bg-surface-container-lowest rounded-[3rem] p-20 overflow-hidden shadow-[0_12px_40px_rgba(27,27,31,0.04)] text-center flex flex-col items-center justify-center min-h-[500px]">
+<div class="absolute inset-0 bg-gradient-to-br from-primary-fixed/20 via-surface-container-lowest to-secondary-fixed/20 opacity-60"></div>
+<div class="absolute top-10 left-10 w-48 h-48 bg-secondary-fixed rounded-full blur-[60px] opacity-30"></div>
+<div class="absolute bottom-10 right-10 w-64 h-64 bg-primary-fixed rounded-full blur-[80px] opacity-30"></div>
+<div class="relative z-10 flex flex-col items-center gap-8">
+<h1 class="font-headline font-bold text-6xl text-on-surface tracking-tight leading-[1.1] max-w-3xl">Shape the future of <br/>organic technology</h1>
+<p class="font-body text-xl text-on-surface-variant max-w-2xl">Join our team of innovators building sustainable solutions for tomorrow's challenges.</p>
+<div class="mt-4 px-10 py-4 rounded-full bg-primary text-on-primary font-body font-medium shadow-[0_8px_24px_rgba(0,48,131,0.2)] text-lg cursor-pointer">
+                                    View Open Positions
+                                </div>
+</div>
+</div>
+<div class="flex flex-col gap-10">
+<div class="flex justify-between items-end border-b border-outline-variant/10 pb-6">
+<h2 class="font-headline font-bold text-4xl text-on-surface tracking-tight">Open Roles</h2>
+<div class="flex gap-3">
+<div class="px-5 py-2 rounded-full bg-secondary-container text-on-secondary-container font-body text-sm font-semibold">Engineering</div>
+<div class="px-5 py-2 rounded-full bg-surface-container-high text-on-surface font-body text-sm font-semibold">Design</div>
+<div class="px-5 py-2 rounded-full bg-surface-container-high text-on-surface font-body text-sm font-semibold">Marketing</div>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_8px_24px_rgba(27,27,31,0.04)] ring-1 ring-outline-variant/10 flex flex-col gap-6 hover:shadow-xl transition-all cursor-pointer">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-xl text-on-surface">Senior Frontend Engineer</h3>
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+<div class="flex gap-3">
+<span class="text-sm font-body text-on-surface-variant px-3 py-1.5 bg-surface-container rounded-lg">Remote</span>
+<span class="text-sm font-body text-on-surface-variant px-3 py-1.5 bg-surface-container rounded-lg">Full-time</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_8px_24px_rgba(27,27,31,0.04)] ring-1 ring-outline-variant/10 flex flex-col gap-6 hover:shadow-xl transition-all cursor-pointer">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-xl text-on-surface">Product Designer</h3>
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+<div class="flex gap-3">
+<span class="text-sm font-body text-on-surface-variant px-3 py-1.5 bg-surface-container rounded-lg">New York</span>
+<span class="text-sm font-body text-on-surface-variant px-3 py-1.5 bg-surface-container rounded-lg">Full-time</span>
+</div>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-[2rem] shadow-[0_8px_24px_rgba(27,27,31,0.04)] ring-1 ring-outline-variant/10 flex flex-col gap-6 hover:shadow-xl transition-all cursor-pointer">
+<div class="flex justify-between items-start">
+<h3 class="font-headline font-bold text-xl text-on-surface">Technical Writer</h3>
+<span class="material-symbols-outlined text-primary">arrow_forward</span>
+</div>
+<div class="flex gap-3">
+<span class="text-sm font-body text-on-surface-variant px-3 py-1.5 bg-surface-container rounded-lg">London</span>
+<span class="text-sm font-body text-on-surface-variant px-3 py-1.5 bg-surface-container rounded-lg">Contract</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<input checked="" class="hidden" id="side-panel-toggle" type="checkbox"/>
+<label class="absolute right-0 top-1/2 -translate-y-1/2 z-50 bg-primary text-on-primary w-10 h-24 rounded-l-2xl flex items-center justify-center cursor-pointer shadow-[-4px_0_12px_rgba(0,48,131,0.2)] transition-all duration-300" for="side-panel-toggle">
+<span class="material-symbols-outlined toggle-icon transition-transform duration-300">chevron_left</span>
+</label>
+<aside class="absolute top-0 right-0 h-full w-[400px] bg-surface-container-lowest/90 backdrop-blur-2xl border-l border-outline-variant/15 z-40 transform translate-x-full transition-transform duration-300 shadow-[-12px_0_40px_rgba(27,27,31,0.1)] flex flex-col" id="editor-overlay">
+<div class="flex flex-col h-full pt-28">
+<div class="px-8 pb-4 border-b border-outline-variant/15">
+<h3 class="font-headline font-bold text-2xl text-on-surface">Editor Tools</h3>
+<p class="text-on-surface-variant text-sm">Customize themes and sections</p>
+</div>
+<div class="flex-1 overflow-y-auto p-8 flex flex-col gap-8 custom-scrollbar">
+<section class="flex flex-col gap-6">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">palette</span>
+<h4 class="font-headline font-semibold text-lg text-on-surface">Theme Settings</h4>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-body text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Company Logo</label>
+<div class="border-2 border-dashed border-outline-variant/50 rounded-xl p-6 flex flex-col items-center justify-center gap-3 bg-surface-container-low/50 hover:bg-surface-container/50 transition-colors cursor-pointer group">
+<span class="material-symbols-outlined text-outline group-hover:text-primary transition-colors text-3xl">cloud_upload</span>
+<span class="font-body text-sm text-on-surface-variant text-center">Drag &amp; drop logo or <span class="text-primary font-semibold">browse</span></span>
+</div>
+</div>
+<div class="flex flex-col gap-4">
+<label class="font-body text-xs font-semibold text-on-surface-variant uppercase tracking-wider">Brand Colors</label>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between bg-surface-container p-3 rounded-xl ring-1 ring-outline-variant/15">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary shadow-sm ring-1 ring-inset ring-black/10"></div>
+<div class="flex flex-col">
+<span class="font-body text-xs text-on-surface-variant">Primary</span>
+<span class="font-body text-sm text-on-surface uppercase font-mono">#003083</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-outline-variant hover:text-on-surface transition-colors">colorize</button>
+</div>
+<div class="flex items-center justify-between bg-surface-container p-3 rounded-xl ring-1 ring-outline-variant/15">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-secondary shadow-sm ring-1 ring-inset ring-black/10"></div>
+<div class="flex flex-col">
+<span class="font-body text-xs text-on-surface-variant">Secondary</span>
+<span class="font-body text-sm text-on-surface uppercase font-mono">#00677d</span>
+</div>
+</div>
+<button class="material-symbols-outlined text-outline-variant hover:text-on-surface transition-colors">colorize</button>
+</div>
+</div>
+</div>
+</section>
+<div class="h-px bg-outline-variant/15 w-full"></div>
+<section class="flex flex-col gap-6">
+<div class="flex justify-between items-center">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">view_agenda</span>
+<h4 class="font-headline font-semibold text-lg text-on-surface">Page Sections</h4>
+</div>
+<button aria-label="Add Section" class="bg-primary-container/20 text-primary hover:bg-primary-container/30 p-2 rounded-lg transition-colors flex items-center gap-1 text-xs font-bold uppercase tracking-wider pr-3">
+<span class="material-symbols-outlined text-lg">add</span>
+                                Add
+                            </button>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all ring-1 ring-outline-variant/15 cursor-grab group shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface-variant">drag_indicator</span>
+<div class="flex flex-col">
+<span class="font-body text-sm font-semibold text-on-surface">Hero Section</span>
+</div>
+</div>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-on-surface-variant hover:text-primary p-1.5 rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-1.5 rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all ring-1 ring-outline-variant/15 cursor-grab group shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface-variant">drag_indicator</span>
+<div class="flex flex-col">
+<span class="font-body text-sm font-semibold text-on-surface">About Us</span>
+</div>
+</div>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-on-surface-variant hover:text-primary p-1.5 rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-1.5 rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all ring-1 ring-outline-variant/15 cursor-grab group shadow-sm">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-outline group-hover:text-on-surface-variant">drag_indicator</span>
+<div class="flex flex-col">
+<span class="font-body text-sm font-semibold text-on-surface">Life at Company</span>
+</div>
+</div>
+<div class="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="text-on-surface-variant hover:text-primary p-1.5 rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary p-1.5 rounded-lg hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+</div>
+</div>
+<div class="flex items-center justify-between p-4 rounded-xl bg-surface-container hover:bg-surface-container-high transition-all ring-1 ring-outline-variant/15 cursor-grab group shadow-sm border-2 border-primary/20">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-primary">drag_indicator</span>
+<div class="flex flex-col">
+<span class="font-body text-sm font-semibold text-on-surface">Open Roles</span>
+</div>
+</div>
+<div class="flex gap-1 opacity-100">
+<button class="text-primary p-1.5 rounded-lg bg-primary-container/10 transition-colors">
+<span class="material-symbols-outlined text-lg">visibility</span>
+</button>
+<button class="text-primary p-1.5 rounded-lg bg-primary-container/10 transition-colors">
+<span class="material-symbols-outlined text-lg">edit</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</div>
+<div class="p-8 bg-surface-container/30 border-t border-outline-variant/15">
+<button class="w-full py-3 rounded-xl bg-surface-container-highest text-on-surface font-semibold text-sm hover:bg-surface-dim transition-colors flex items-center justify-center gap-2 shadow-sm">
+<span class="material-symbols-outlined text-xl">undo</span>
+                        Revert All Changes
+                    </button>
+</div>
+</div>
+</aside>
+</main>
+
+</body></html>

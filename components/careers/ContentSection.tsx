@@ -6,9 +6,10 @@ import LifeSection from './LifeSection'
 
 interface Props {
   section: CompanySection
+  companyName?: string
 }
 
-export default function ContentSection({ section }: Props) {
+export default function ContentSection({ section, companyName = 'Company' }: Props) {
   const { type, title, content } = section
 
   switch (type) {
@@ -17,15 +18,15 @@ export default function ContentSection({ section }: Props) {
         <AboutSection
           title={title}
           content={content.text || 'No content provided.'}
-          imageUrl={content.image || undefined}
-          companyName={title} // fallback
+          imageUrl={content.image_url || undefined}
+          companyName={companyName}
         />
       )
 
     case 'life':
       return (
         <LifeSection
-          companyName={title}
+          companyName={companyName}
           images={Array.isArray(content.images) ? content.images.map((url: string) => ({ url, alt: title })) : []}
           title={title}
           description={content.description}

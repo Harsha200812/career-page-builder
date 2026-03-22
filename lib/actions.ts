@@ -6,6 +6,40 @@ import { redirect } from 'next/navigation'
 import { CompanyTheme, CompanySection } from '@/lib/types'
 
 // ============================================
+// Company Info Actions
+// ============================================
+
+export async function updateCompanyInfo(
+  companyId: string,
+  companyData: { name: string; description?: string }
+) {
+  const supabase = await createClient()
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Unauthorized')
+
+  const { data: membership } = await supabase
+    .from('company_users')
+    .select('id')
+    .eq('company_id', companyId)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!membership) throw new Error('Forbidden - Not a member of this company')
+
+  const { error } = await supabase
+    .from('companies')
+    .update(companyData)
+    .eq('id', companyId)
+
+  if (error) throw new Error(`Failed to update company info: ${error.message}`)
+
+  revalidatePath(`/[company-slug]/careers`, 'page')
+  revalidatePath(`/[company-slug]/preview`, 'page')
+  return { success: true }
+}
+
+// ============================================
 // Company Theme Actions
 // ============================================
 
@@ -38,18 +72,17 @@ export async function updateCompanyTheme(
 
   const { error } = await supabase
     .from('company_themes')
-    .upsert({
-      company_id: companyId,
-      ...themeData,
-      updated_at: new Date().toISOString(),
-    })
+    .upsert(
+      { company_id: companyId, ...themeData },
+      { onConflict: 'company_id' }
+    )
 
   if (error) {
     throw new Error(`Failed to update theme: ${error.message}`)
   }
 
-  revalidatePath(`/[company-slug]/careers`)
-  revalidatePath(`/[company-slug]/preview`)
+  revalidatePath(`/[company-slug]/careers`, 'page')
+  revalidatePath(`/[company-slug]/preview`, 'page')
   return { success: true }
 }
 
@@ -79,8 +112,8 @@ export async function reorderSections(companyId: string, sectionIds: string[]) {
   )
 
   await Promise.all(updates)
-  revalidatePath(`/[company-slug]/careers`)
-  revalidatePath(`/[company-slug]/preview`)
+  revalidatePath(`/[company-slug]/careers`, 'page')
+  revalidatePath(`/[company-slug]/preview`, 'page')
   return { success: true }
 }
 
@@ -109,7 +142,7 @@ export async function updateSection(
     throw new Error(`Failed to update section: ${error.message}`)
   }
 
-  revalidatePath(`/[company-slug]/careers`)
+  revalidatePath(`/[company-slug]/careers`, 'page')
   return { success: true }
 }
 
@@ -136,7 +169,7 @@ export async function createSection(
     throw new Error(`Failed to create section: ${error.message}`)
   }
 
-  revalidatePath(`/[company-slug]/careers`)
+  revalidatePath(`/[company-slug]/careers`, 'page')
   return { success: true }
 }
 
@@ -161,7 +194,7 @@ export async function deleteSection(companyId: string, sectionId: string) {
     throw new Error(`Failed to delete section: ${error.message}`)
   }
 
-  revalidatePath(`/[company-slug]/careers`)
+  revalidatePath(`/[company-slug]/careers`, 'page')
   return { success: true }
 }
 
@@ -189,7 +222,7 @@ export async function createJob(companyId: string, jobData: any) {
     throw new Error(`Failed to create job: ${error.message}`)
   }
 
-  revalidatePath(`/[company-slug]/careers`)
+  revalidatePath(`/[company-slug]/careers`, 'page')
   return { success: true }
 }
 
@@ -214,7 +247,7 @@ export async function updateJob(companyId: string, jobId: string, jobData: any) 
     throw new Error(`Failed to update job: ${error.message}`)
   }
 
-  revalidatePath(`/[company-slug]/careers`)
+  revalidatePath(`/[company-slug]/careers`, 'page')
   return { success: true }
 }
 
@@ -239,6 +272,6 @@ export async function deleteJob(companyId: string, jobId: string) {
     throw new Error(`Failed to delete job: ${error.message}`)
   }
 
-  revalidatePath(`/[company-slug]/careers`)
+  revalidatePath(`/[company-slug]/careers`, 'page')
   return { success: true }
 }

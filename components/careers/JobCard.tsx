@@ -1,105 +1,73 @@
 'use client'
 
 import { Job } from '@/lib/types'
-import { MapPin, Building, Clock, Briefcase, DollarSign } from 'lucide-react'
-import { Button, buttonVariants } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { MapPin, Briefcase, Clock, DollarSign, ChevronRight } from 'lucide-react'
 
 interface Props {
   job: Job
 }
 
 export default function JobCard({ job }: Props) {
-  const getWorkPolicyColor = (policy: string) => {
-    switch (policy) {
-      case 'Remote':
-        return 'bg-green-100 text-green-800 hover:bg-green-200'
-      case 'Hybrid':
-        return 'bg-yellow-100 text-yellow-800 hover:bg-yellow-200'
-      case 'On-site':
-        return 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-      default:
-        return 'bg-gray-100 text-gray-800'
-    }
+  const policyColors: Record<string, { bg: string; text: string }> = {
+    Remote: { bg: 'bg-emerald-50', text: 'text-emerald-700' },
+    Hybrid: { bg: 'bg-amber-50', text: 'text-amber-700' },
+    'On-site': { bg: 'bg-blue-50', text: 'text-blue-700' },
   }
 
-  const getTypeColor = (type: string) => {
-    // Different colors for employment types
-    const colors = {
-      'Full-time': 'bg-purple-100 text-purple-800',
-      'Contract': 'bg-orange-100 text-orange-800',
-      'Part-time': 'bg-teal-100 text-teal-800',
-      'Internship': 'bg-pink-100 text-pink-800',
-    }
-    return colors[type as keyof typeof colors] || 'bg-gray-100 text-gray-800'
-  }
+  const policy = policyColors[job.work_policy] || { bg: 'bg-slate-50', text: 'text-slate-600' }
+
+  const daysAgo = Math.floor(
+    (Date.now() - new Date(job.posted_at).getTime()) / (1000 * 60 * 60 * 24)
+  )
+  const postedLabel = daysAgo === 0 ? 'Today' : daysAgo === 1 ? '1 day ago' : `${daysAgo}d ago`
 
   return (
-    <div className="job-card bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-        {/* Job info */}
-        <div className="flex-1 space-y-3">
-          {/* Title & badges */}
-          <div className="space-y-3">
-            <h3
-              className="text-xl font-bold leading-tight"
-              style={{ color: 'var(--company-primary)' }}
-            >
-              {job.title}
-            </h3>
-
-            <div className="flex flex-wrap gap-2">
-              {/* Work Policy Badge */}
-              <span
-                className={`badge ${getWorkPolicyColor(job.work_policy)}`}
-              >
-                {job.work_policy}
-              </span>
-
-              {/* Employment Type Badge */}
-              <span className={`badge ${getTypeColor(job.employment_type)}`}>
-                {job.employment_type}
-              </span>
-
-              {/* Department Badge */}
-              <span className="badge bg-gray-100 text-gray-700">
-                {job.department}
-              </span>
-            </div>
+    <div className="group bg-white rounded-2xl border border-slate-100 hover:border-slate-200 p-6 transition-all duration-300 hover:shadow-xl hover:shadow-slate-100/50 hover:-translate-y-1 cursor-pointer">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        {/* Left: Job Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-semibold ${policy.bg} ${policy.text}`}>
+              {job.work_policy}
+            </span>
+            <span className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-50 text-slate-500">
+              {job.department}
+            </span>
+            <span className="text-xs text-slate-400 ml-auto md:ml-0">{postedLabel}</span>
           </div>
 
-          {/* Details */}
-          <div className="flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-1.5">
-              <MapPin className="h-4 w-4" />
-              <span>{job.location}</span>
-            </div>
+          <h3 className="text-lg font-bold text-slate-900 mb-2 group-hover:text-[var(--company-primary)] transition-colors">
+            {job.title}
+          </h3>
 
-            <div className="flex items-center gap-1.5">
-              <Briefcase className="h-4 w-4" />
-              <span>{job.experience_level}</span>
-            </div>
-
+          <div className="flex flex-wrap items-center gap-4 text-sm text-slate-500">
+            <span className="inline-flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5" />
+              {job.location}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Briefcase className="w-3.5 h-3.5" />
+              {job.employment_type}
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5" />
+              {job.experience_level}
+            </span>
             {job.salary_range && (
-              <div className="flex items-center gap-1.5">
-                <DollarSign className="h-4 w-4" />
-                <span className="font-medium text-foreground">{job.salary_range}</span>
-              </div>
+              <span className="inline-flex items-center gap-1.5">
+                <DollarSign className="w-3.5 h-3.5" />
+                {job.salary_range}
+              </span>
             )}
           </div>
         </div>
 
-        {/* Apply button */}
+        {/* Right: CTA */}
         <div className="flex-shrink-0">
-          <Button
-            className={cn(
-              buttonVariants({ variant: 'default' }),
-              'px-6 py-3 rounded-xl'
-            )}
-            style={{ backgroundColor: 'var(--company-primary)' }}
-          >
-            Apply Now
-          </Button>
+          <div className="flex items-center gap-2 text-sm font-semibold text-[var(--company-primary)] group-hover:translate-x-1 transition-transform">
+            View Role
+            <ChevronRight className="w-4 h-4" />
+          </div>
         </div>
       </div>
     </div>
