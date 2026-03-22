@@ -1,5 +1,4 @@
 import { redirect } from 'next/navigation'
-import EditorPage from '@/components/editor/EditorPage'
 
 interface PageProps {
   params: Promise<{ 'company-slug': string }>
@@ -38,9 +37,9 @@ export default async function EditPage({ params }: PageProps) {
     .single()
 
   if (!membership) {
-    // User is not authorized for this company
     redirect('/')
   }
 
-  return <EditorPage slug={slug} />
+  // Redirect to careers page - editing is now inline
+  redirect(`/${slug}/careers`)
 }

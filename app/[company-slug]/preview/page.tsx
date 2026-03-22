@@ -1,12 +1,7 @@
-import { notFound } from 'next/navigation'
-import Navigation from '@/components/careers/Navigation'
-import HeroSection from '@/components/careers/HeroSection'
-import AboutSection from '@/components/careers/AboutSection'
-import LifeSection from '@/components/careers/LifeSection'
-import JobCard from '@/components/careers/JobCard'
-import JobFilters from '@/components/careers/JobFilters'
-import Footer from '@/components/careers/Footer'
-import ContentSection from '@/components/careers/ContentSection'
+import { notFound, redirect } from 'next/navigation'
+import Link from 'next/link'
+import { ArrowLeft, Eye } from 'lucide-react'
+import EditableCareersLayout from '@/components/layout/EditableCareersLayout'
 
 interface PageProps {
   params: Promise<{ 'company-slug': string }>
@@ -22,33 +17,25 @@ export async function generateMetadata({ params }: PageProps) {
     .eq('slug', slug)
     .single()
 
-  if (!company) {
-    return {
-      title: 'Careers Page Not Found',
-    }
-  }
+  if (!company) return { title: 'Preview Not Found' }
 
   return {
-    title: `Careers at ${company.name}`,
-    description: company.description || `Explore career opportunities at ${company.name}`,
-    openGraph: {
-      title: `Careers at ${company.name}`,
-      description: company.description || undefined,
-      type: 'website',
-    },
+    title: `[Preview] Careers at ${company.name}`,
+    description: company.description || `Preview of ${company.name}'s careers page`,
   }
 }
 
-export default async function CareersPage({ params }: PageProps) {
+export default async function PreviewPage({ params }: PageProps) {
   const { 'company-slug': slug } = await params
   const supabase = await (await import('@/lib/supabase/server')).createClient()
 
+  // Auth guard — only recruiters can see preview
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
-    notFound()
+    redirect('/login')
   }
 
-  // Fetch company data
+  // Fetch company
   const { data: company, error: companyError } = await supabase
     .from('companies')
     .select('*')
@@ -59,6 +46,18 @@ export default async function CareersPage({ params }: PageProps) {
     notFound()
   }
 
+  // Verify user is a member of this company
+  const { data: membership } = await supabase
+    .from('company_users')
+    .select('id')
+    .eq('company_id', company.id)
+    .eq('user_id', user.id)
+    .single()
+
+  if (!membership) {
+    redirect('/')
+  }
+
   // Fetch theme
   const { data: theme } = await supabase
     .from('company_themes')
@@ -66,12 +65,11 @@ export default async function CareersPage({ params }: PageProps) {
     .eq('company_id', company.id)
     .single()
 
-  // Fetch visible sections
-  const { data: sections } = await supabase
+  // Fetch all sections (preview shows all sections regardless of visibility)
+  const { data: allSections } = await supabase
     .from('company_sections')
     .select('*')
     .eq('company_id', company.id)
-    .eq('is_visible', true)
     .order('sort_order', { ascending: true })
 
   // Fetch active jobs
@@ -82,124 +80,65 @@ export default async function CareersPage({ params }: PageProps) {
     .eq('is_active', true)
     .order('posted_at', { ascending: false })
 
-  // Theme colors
-  const primaryColor = theme?.primary_color || '#2563eb'
-  const secondaryColor = theme?.secondary_color || '#64748b'
-  const logoUrl = theme?.logo_url
-  const bannerUrl = theme?.banner_url
+  const visibleSections = (allSections || []).filter(s => s.is_visible)
 
   return (
-    <div className="min-h-screen bg-background relative" style={{
-      '--company-primary': primaryColor,
-      '--company-secondary': secondaryColor,
-    } as React.CSSProperties}>
+    <div className="relative">
       {/* Preview Banner */}
-      <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-[#1b1b1f] text-[#fbf8fe] px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 font-medium text-sm animate-in slide-in-from-top-4">
-        <span className="relative flex h-3 w-3">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#0044b4] opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-3 w-3 bg-[#003083]"></span>
-        </span>
-        Recruiter Preview Mode
+      <div className="fixed top-0 left-0 right-0 z-[100] bg-slate-900/95 backdrop-blur-xl border-b border-slate-700/50 shadow-xl shadow-slate-900/20">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+          {/* Left: Back to Editor */}
+          <Link
+            href={`/${slug}/careers`}
+            className="inline-flex items-center gap-2 text-slate-400 hover:text-white transition-colors text-sm font-medium group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
+            <span className="hidden sm:inline">Back to Editor</span>
+          </Link>
+
+          {/* Center: Preview Label */}
+          <div className="flex items-center gap-2.5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
+            </span>
+            <span className="text-white text-sm font-semibold tracking-wide">Preview Mode</span>
+            <span className="hidden sm:inline text-slate-400 text-xs">— Exactly how candidates see your page</span>
+          </div>
+
+          {/* Right: View Live / Status */}
+          <div className="flex items-center gap-3">
+            {company.is_published ? (
+              <Link
+                href={`/${slug}/careers`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-bold transition-colors shadow-md shadow-emerald-900/20"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                View Live
+              </Link>
+            ) : (
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-700 text-slate-300 text-xs font-semibold">
+                Not Published Yet
+              </span>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* Navigation */}
-      <Navigation companyName={company.name} slug={slug} />
+      {/* Spacer for the fixed banner height */}
+      <div className="h-12" />
 
-      {/* Hero Section */}
-      <HeroSection
-        companyName={company.name}
-        tagline={theme?.hero_title || `Careers at ${company.name}`}
-        description={theme?.hero_subtitle || company.description || ''}
-        logoUrl={logoUrl}
-        bannerUrl={bannerUrl}
-        onPrimaryColor={primaryColor}
-        onSecondaryColor={secondaryColor}
-      />
-
-      {/* About Section - either from sections or company description */}
-      {sections?.find(s => s.type === 'about') ? (
-        sections.filter(s => s.type === 'about').map(section => (
-          <ContentSection key={section.id} section={section} companyName={company.name} />
-        ))
-      ) : (
-        company.description && (
-          <AboutSection
-            title="Our Story"
-            content={company.description}
-            imageUrl={undefined}
-            companyName={company.name}
-          />
-        )
-      )}
-
-      {/* Life/Culture Section */}
-      {sections?.find(s => s.type === 'life') && (
-        <LifeSection
-          companyName={company.name}
-          title="Life at Company"
-          description="A glimpse into our workplace culture"
-          images={
-            (sections.find(s => s.type === 'life')?.content.images as string[])?.map(url => ({ url, alt: company.name })) || []
-          }
-        />
-      )}
-
-      {/* Culture Video */}
-      {theme?.culture_video_url && (
-        <section className="py-20 px-6 md:px-12 max-w-[1000px] mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="font-headline text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--company-on-surface)' }}>
-              Inside {company.name}
-            </h2>
-          </div>
-          <div className="aspect-video w-full rounded-[2.5rem] overflow-hidden shadow-2xl border border-black/5 bg-black/5">
-            <iframe 
-              src={theme.culture_video_url} 
-              className="w-full h-full border-none" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowFullScreen
-              title="Culture Video"
-            />
-          </div>
-        </section>
-      )}
-
-      {/* Other sections (values, benefits, custom) */}
-      {sections?.filter(s => 
-        !['about', 'life'].includes(s.type) && 
-        !(s.type === 'custom' && s.title === 'Footer')
-      ).map(section => (
-        <ContentSection key={section.id} section={section} companyName={company.name} />
-      ))}
-
-      {/* Job Listings h2 and filters */}
-      <section id="roles" className="py-20 md:py-32 px-6 md:px-12 max-w-[1000px] mx-auto">
-        <div className="text-center mb-16 md:mb-20">
-          <span
-            className="inline-block px-4 py-1.5 mb-4 rounded-full text-xs font-bold tracking-widest uppercase"
-            style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.05)',
-              color: 'var(--company-secondary)',
-            }}
-          >
-            Open Positions
-          </span>
-          <h2 className="font-headline text-4xl md:text-5xl font-extrabold mb-4" style={{ color: 'var(--company-on-surface)' }}>
-            Open Roles
-          </h2>
-          <p className="max-w-2xl mx-auto text-lg" style={{ color: 'var(--company-on-surface-variant)' }}>
-            Find your next opportunity and help us build the future.
-          </p>
-        </div>
-
-        {/* Filters + Job List */}
-        <JobFilters initialJobs={jobs || []} />
-      </section>
-
-      {/* Footer */}
-      <Footer 
-        companyName={company.name} 
-        data={sections?.find(s => s.type === 'custom' && s.title === 'Footer')?.content} 
+      {/* The careers page — rendered in public (candidate) mode, no toolbar */}
+      <EditableCareersLayout
+        company={company}
+        theme={theme}
+        allSections={allSections || []}
+        visibleSections={visibleSections}
+        jobs={jobs || []}
+        isRecruiter={false}
+        currentUserId={user.id}
       />
     </div>
   )

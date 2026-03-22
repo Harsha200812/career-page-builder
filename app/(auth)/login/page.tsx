@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { Loader2 } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -13,72 +14,43 @@ export default function LoginPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  useEffect(() => {
-    // Check if user is already logged in
-    const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        // Get user's company
-        const { data: membership } = await supabase
-          .from('company_users')
-          .select('company_id, companies!inner(slug)')
-          .eq('user_id', session.user.id)
-          .single()
-
-        if (membership && membership.companies) {
-          const companies: any = membership.companies
-          const companySlug = Array.isArray(companies) ? companies[0]?.slug : companies.slug
-          if (companySlug) {
-            router.push(`/${companySlug}/edit`)
-            return
-          }
-        }
-        
-        // No company assigned - could redirect to onboarding
-        router.push('/')
-      }
-    }
-
-    checkSession()
-  }, [router, supabase])
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    const { error: authError } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (error) {
-      setError(error.message)
-    } else {
-      // Get user's company and redirect
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        const { data: membership } = await supabase
-          .from('company_users')
-          .select('company_id, companies!inner(slug)')
-          .eq('user_id', session.user.id)
-          .single()
+    if (authError) {
+      setError(authError.message)
+      setLoading(false)
+      return
+    }
 
-        if (membership && membership.companies) {
-          const companies: any = membership.companies
-          const companySlug = Array.isArray(companies) ? companies[0]?.slug : companies.slug
-          if (companySlug) {
-            router.push(`/${companySlug}/edit`)
-            return
-          }
+    // Get user's company and redirect
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: membership } = await supabase
+        .from('company_users')
+        .select('company_id, companies!inner(slug)')
+        .eq('user_id', user.id)
+        .single()
+
+      if (membership && membership.companies) {
+        const companies: any = membership.companies
+        const companySlug = Array.isArray(companies) ? companies[0]?.slug : companies.slug
+        if (companySlug) {
+          router.push(`/${companySlug}/careers`)
+          return
         }
-        
-        router.push('/')
       }
+      
+      router.push('/')
     }
 
     setLoading(false)
   }
+
 
   return (
     <div className="min-h-screen w-full relative overflow-hidden flex items-center justify-center bg-[#f8fafc]">
@@ -190,7 +162,7 @@ export default function LoginPage() {
             </button>
             <p className="mt-10 text-center text-sm font-medium text-[#475569]">
               New to the mission? 
-              <Link className="text-[#0047AB] font-bold hover:text-blue-700 transition-colors ml-1" href="/">Join the Pool</Link>
+              <Link className="text-[#0047AB] font-bold hover:text-blue-700 transition-colors ml-1" href="/signup">Join the Pool</Link>
             </p>
           </div>
           

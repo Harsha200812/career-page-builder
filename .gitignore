@@ -40,3 +40,19 @@ next-env.d.ts
 .agent
 # Supabase
 .supabase
+
+# Docs
+docs
+
+# AI Tools and Agents
+.cursor
+.aider*
+.gemini
+_agents/
+.bolt
+
+# Secrets & Local DB
+*.sqlite
+*.sqlite3
+*.db
+supabase/.temp/
