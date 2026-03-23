@@ -1,119 +1,59 @@
 # Tech Specification
 
-## 1. Overview
+## Architecture
 
-Brief description of the system architecture and goals.
+We're using Next.js 14 with the App Router. The frontend talks directly to Next.js API routes, which handle all the database operations through Supabase. Supabase Auth takes care of user management and authentication.
 
-## 2. System Architecture
-
-### High-Level Diagram
-
-[Describe or embed diagram]
-
-### Components
-
-- Frontend: Next.js 14 App Router
-- Backend: Next.js API Routes + Server Components
+**Components:**
+- Frontend: Next.js 14 with server components where possible
+- Backend: Next.js API routes (no separate server needed)
 - Database: Supabase PostgreSQL
 - Auth: Supabase Auth
-- Storage: Supabase Storage (for media assets)
+- File storage: Supabase Storage for company logos and assets
 
-## 3. Database Schema
+Right now the public pages render with Server-Side Rendering so job listings show up immediately when shared. We might add Incremental Static Regeneration later if we need better performance.
 
-Refer to `supabase/migrations/001_initial_schema.sql` for complete schema.
+## Database Schema
 
-### Tables
+We keep data isolated per company using the company's slug in the URL and Row Level Security policies. The main tables are:
 
-- `companies` - Company metadata
-- `company_themes` - Brand theme settings
-- `company_sections` - Content sections (ordered)
-- `jobs` - Job postings
-- `company_users` - Recruiter access control
+- **companies** - Company name, slug, and basic info
+- **company_themes** - Colors, fonts, logo URLs
+- **company_sections** - The content sections (hero, about, footer, etc.) in order
+- **jobs** - Job title, description, location, department, status
+- **company_users** - Links users to companies with role-based access
 
-### Multi-Tenancy Strategy
+The company slug becomes part of the URL (`/acme-inc/careers`), and every query filters by that company. RLS ensures recruiters can only see their own company's data.
 
-- Company slug in URL: `/[company-slug]/careers`
-- Row Level Security (RLS) enforces data isolation
-- Each company can only access their own data
+See `supabase/migrations/001_initial_schema.sql` for the complete schema with all constraints and relationships.
 
-## 4. API Design
+## Assumptions
 
-### Public Endpoints
+- One company = one careers page (no multi-brand support)
+- Everyone on the recruiter side uses Supabase Auth to sign in
+- Public pages use SSR for SEO and fast first loads
+- Jobs filtering happens on the client after the initial page load keeps things snappy
+- File uploads go to private Supabase buckets; we'll generate signed URLs if companies need to share assets publicly
 
-- `GET /api/companies/[slug]` - Fetch company details (for public pages)
-- `GET /api/companies/[slug]/jobs` - List active jobs with filters
+## Test Plan
 
-### Protected Endpoints (Recruiter)
+### Things we should test
 
-- `GET /api/companies/[slug]/editor` - Fetch full company data for editor
-- `PUT /api/companies/[slug]/theme` - Update theme
-- `POST /api/companies/[slug]/sections` - Create/update/reorder sections
-- `POST /api/companies/[slug]/jobs` - CRUD for jobs
+**Component tests:**
+- JobCard renders correctly with different data
+- JobFilters don't break when the filter list is empty
+- ThemeCustomizer applies colors properly
 
-## 5. Key Assumptions
+**API tests:**
+- `GET /api/companies/[slug]/jobs` returns only active jobs
+- Filtering by location/department works as expected
+- Protected routes reject unauthenticated requests
 
-- Each company has one careers page
-- Recruiters authenticate via Supabase Auth
-- SEO: Public pages use SSR with duck-typing for meta tags
-- Jobs are filtered client-side after initial SSR fetch for performance
+**Integration:**
+- Public careers page loads with company data and jobs
+- Editor page shows all content blocks for the logged-in company
 
-## 6. Security Considerations
-
-- Row Level Security (RLS) on all tables
-- API route auth checks using Supabase SSR client
-- Service role key only used in server-side operations (seed script)
-- File uploads stored in private Supabase buckets, served via signed URLs if needed
-
-## 7. Performance & Scalability
-
-- ISR for public pages (optional)
-- Image optimization via Next.js Image component
-- Database indexes on slug, location, department, is_active
-- CDN via Supabase Storage
-
-## 8. Test Plan
-
-### Unit Tests
-
-- [ ] Component rendering (HeroBanner, JobCard, JobFilters)
-- [ ] Utility functions (cn, filtering logic)
-- [ ] TypeScript types
-
-### Integration Tests
-
-- [ ] API route: GET /api/companies/[slug]/jobs with filters
-- [ ] SSR page generation with company data
-
-### Accessibility Tests
-
-- [ ] Color contrast compliance
-- [ ] Keyboard navigation
-- [ ] ARIA labels
-
-## 9. Future Improvements
-
-- Full-text search for jobs (pg_trgm or Algolia)
-- Drag-and-drop section reordering
-- Job application flow integration
-- Analytics tracking
-- Multi-language support
-- Advanced theme editor (font picker, custom CSS)
-- Bulk job import via CSV
-
-## 10. Deployment Architecture
-
-- Platform: Vercel
-- Environment: Node.js 18+
-- Database: Supabase (free tier initially)
-- Storage: Supabase Storage
-- CDN: Vercel Edge Network + Supabase CDN
-
-## 11. Monitoring & Observability
-
-- Vercel Analytics for performance
-- Supabase logs for database queries
-- Error tracking (Sentry or similar)
-
----
-
-_Write this document manually based on your actual implementation decisions._
+**Accessibility:**
+- Color contrast meets WCAG standards
+- Keyboard navigation works through all interactive elements
+- Proper ARIA labels on filters and buttons

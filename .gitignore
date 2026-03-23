@@ -58,5 +58,10 @@ _agents/
 *.db
 supabase/.temp/
 
-#downloads
+# Unnecessary Project Files
 download.js
+download-new.js
+seed_more_jobs.mjs
+project_guide.md
+"docs/[Public] Whitecarrot - Full stack Builder - Assignment 1.txt"
+"docs/AGENT_LOG Draft.md"

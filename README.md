@@ -1,12 +1,23 @@
 # Careers Page Builder
 
-A multi-tenant careers page builder built with Next.js 14, Supabase, and shadcn/ui.
+
+## Introduction
+This is a multi-tenant Careers Page Builder. It allows recruiters to dynamically customize their company's career page, and candidates to browse and filter open jobs continuously.
 
 ## Features
+- An editor that works right on the page—change colors, text, and sections without touching code
+- Live preview so you know exactly what candidates will see
+- Unique URLs for each company, fully separated and secure
+- A mobile-friendly job board with search and filters that actually work
 
-- **Recruiters**: Login, customize brand theme (colors, logo, banner), manage content sections, preview page
-- **Candidates**: Browse companies' careers pages, filter jobs by location and type, search by title
-- Mobile-first, accessible, SEO-ready design
+
+## Step-by-Step User Guide
+
+1. Create an account at `/signup` and add your company
+2. Go to `/dashboard` — this is where you edit
+3. Pick your colors and upload a logo in the theme picker
+4. Click into any section to edit it directly: hero banner, about, footer, everything
+5. Check your public page at `/[your-company-slug]/careers` in an incognito window
 
 ## Tech Stack
 
@@ -93,24 +104,15 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
     └── migrations/     # SQL migrations
 ```
 
-## Deployment
 
-Deploy to Vercel:
 
-1. Push code to GitHub
-2. Import project in Vercel
-3. Set environment variables
-4. Deploy
+## Improvement Plan
 
-## Next Steps
-
-- [ ] Complete editor UI (theme customizer, section manager)
-- [ ] Implement job management CRUD
-- [ ] Add authentication middleware
-- [ ] Enhance SEO with structured data
-- [ ] Write tests
-- [ ] Add image upload to Supabase Storage
-
-## License
-
-MIT
+- Brand color extraction from existing websites
+- Multiple layout templates
+- AI-assisted page building through prompts
+- Theme generation from hero images
+- Real application forms with resume uploads
+- Rich text editor (currently just plain textareas)
+- Custom domain support
+- Basic analytics for page views and job clicks
