@@ -42,10 +42,11 @@ export default function CareersNavigation({ companyName, logoUrl, primaryColor =
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
         {/* Logo / Company Name */}
         <a href="#" className="flex items-center gap-3">
-          {logoUrl && (
+          {logoUrl ? (
             <img src={logoUrl} alt={companyName} className="h-8 w-auto object-contain" />
+          ) : (
+            <span className="text-lg font-bold text-slate-900">{companyName}</span>
           )}
-          <span className="text-lg font-bold text-slate-900">{companyName}</span>
         </a>
 
         {/* Desktop Nav */}
