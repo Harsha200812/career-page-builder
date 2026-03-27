@@ -51,7 +51,7 @@ export default function Home() {
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
-              href="/azure-meridian/careers"
+              href="/whitecarrot-io/careers"
               className="group inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-blue-600 text-white font-bold text-base shadow-xl shadow-blue-600/20 hover:bg-blue-700 transition-all hover:-translate-y-0.5"
             >
               View Live Demo
