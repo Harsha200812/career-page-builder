@@ -11,7 +11,7 @@ export default function Home() {
         </span>
         <div className="flex items-center gap-4">
           <Link
-            href="/azure-meridian/careers"
+            href="/whitecarrot-io/careers"
             className="text-sm font-medium text-slate-600 hover:text-slate-900 transition-colors hidden sm:inline"
           >
             Live Demo
@@ -174,7 +174,7 @@ export default function Home() {
           </span>
           <div className="flex gap-6 text-sm text-slate-400">
             <Link href="/login" className="hover:text-slate-600 transition-colors">Login</Link>
-            <Link href="/azure-meridian/careers" className="hover:text-slate-600 transition-colors">Demo</Link>
+            <Link href="/whitecarrot-io/careers" className="hover:text-slate-600 transition-colors">Demo</Link>
           </div>
         </div>
       </footer>
