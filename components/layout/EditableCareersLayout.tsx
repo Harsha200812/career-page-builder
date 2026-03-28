@@ -29,6 +29,7 @@ interface Props {
   jobs: Job[]
   isRecruiter: boolean
   currentUserId?: string
+  hasUnpublishedChanges?: boolean
 }
 
 export default function EditableCareersLayout({
@@ -39,6 +40,7 @@ export default function EditableCareersLayout({
   jobs: initialJobs,
   isRecruiter,
   currentUserId,
+  hasUnpublishedChanges = false,
 }: Props) {
   const [isEditMode, setIsEditMode] = useState(isRecruiter)
   const [sections, setSections] = useState<CompanySection[]>(isRecruiter ? allSections : visibleSections)
@@ -48,7 +50,7 @@ export default function EditableCareersLayout({
   const [activePanel, setActivePanel] = useState<'theme' | 'sections' | 'company' | 'jobs' | null>(null)
   const [saving, setSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
-  const [isDirty, setIsDirty] = useState(false)
+  const [isDirty, setIsDirty] = useState(hasUnpublishedChanges)
 
   const supabase = createClient()
   const router = useRouter()
@@ -72,7 +74,6 @@ export default function EditableCareersLayout({
     try {
       await saveFn()
       setLastSaved(new Date())
-      setIsDirty(false)
     } catch (error) {
       console.error('Save failed:', error)
       alert('Failed to save changes. Please check your connection and try again.')
@@ -172,6 +173,7 @@ export default function EditableCareersLayout({
   }
 
   const togglePublish = async () => {
+    // Legacy unpublish: if it was published, just unpublish
     const newState = !currentCompany.is_published
     setCurrentCompany({ ...currentCompany, is_published: newState })
     setIsDirty(true)
@@ -181,6 +183,28 @@ export default function EditableCareersLayout({
         .update({ is_published: newState })
         .eq('id', company.id)
       if (error) throw error
+    })
+  }
+
+  const publishChanges = async () => {
+    // Creates a snapshot for the public view
+    await saveWithFeedback(async () => {
+      const snapshot = {
+        theme: currentTheme,
+        sections: sections
+      }
+      
+      const { error } = await supabase
+        .from('companies')
+        .update({ 
+          published_data: snapshot,
+          is_published: true
+        })
+        .eq('id', company.id)
+        
+      if (error) throw error
+      setCurrentCompany({ ...currentCompany, is_published: true })
+      setIsDirty(false) // Snapshot matches live drafts
     })
   }
 
@@ -207,6 +231,7 @@ export default function EditableCareersLayout({
           companySlug={company.slug}
           isPublished={currentCompany.is_published}
           onPublishToggle={togglePublish}
+          onPublish={publishChanges}
           saving={saving}
           lastSaved={lastSaved}
           isDirty={isDirty}
@@ -236,6 +261,7 @@ export default function EditableCareersLayout({
           initialDescription={currentCompany.description || ''}
           onUpdate={(name, description) => {
             setCurrentCompany({ ...currentCompany, name, description })
+            setIsDirty(true)
           }}
           onClose={() => setActivePanel(null)}
         />

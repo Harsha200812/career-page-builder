@@ -123,7 +123,7 @@ export default function LoginPage() {
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
-                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#475569]" htmlFor="password">Security Key</label>
+                  <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#475569]" htmlFor="password">Passoword</label>
                   <a className="text-[10px] font-bold text-[#0047AB] hover:text-blue-700 uppercase tracking-wider transition-colors" href="#">Reset</a>
                 </div>
                 <input 
@@ -162,7 +162,7 @@ export default function LoginPage() {
             </button>
             <p className="mt-10 text-center text-sm font-medium text-[#475569]">
               New to the mission? 
-              <Link className="text-[#0047AB] font-bold hover:text-blue-700 transition-colors ml-1" href="/signup">Join the Pool</Link>
+              <Link className="text-[#0047AB] font-bold hover:text-blue-700 transition-colors ml-1" href="/signup">Sign Up</Link>
             </p>
           </div>
           

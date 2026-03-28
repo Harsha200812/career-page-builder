@@ -6,6 +6,7 @@ export interface Company {
   created_at: string
   updated_at: string
   is_published: boolean
+  published_data?: any | null
 }
 
 export interface CompanyTheme {

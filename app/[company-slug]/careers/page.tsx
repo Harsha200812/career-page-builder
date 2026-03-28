@@ -1,5 +1,6 @@
 import { notFound } from 'next/navigation'
 import EditableCareersLayout from '@/components/layout/EditableCareersLayout'
+import { CompanySection, CompanyTheme } from '@/lib/types'
 
 interface PageProps {
   params: Promise<{ 'company-slug': string }>
@@ -64,19 +65,8 @@ export default async function CareersPage({ params }: PageProps) {
     notFound()
   }
 
-  // Fetch all data
-  const { data: theme } = await supabase
-    .from('company_themes')
-    .select('*')
-    .eq('company_id', company.id)
-    .single()
-
-  const { data: allSections } = await supabase
-    .from('company_sections')
-    .select('*')
-    .eq('company_id', company.id)
-    .order('sort_order', { ascending: true })
-
+  // Fetch live active jobs, since jobs are still independently managed if desired,
+  // or they can be part of the snapshot. Actually, jobs are fetched from relational DB.
   const { data: jobs } = await supabase
     .from('jobs')
     .select('*')
@@ -84,18 +74,62 @@ export default async function CareersPage({ params }: PageProps) {
     .eq('is_active', true)
     .order('posted_at', { ascending: false })
 
+  // Determine which data to pass to layout
+  let themeData: CompanyTheme | null = null;
+  let allSectionsData: CompanySection[] = [];
+  let hasUnpublishedChanges = false;
+
+  if (isRecruiter) {
+    // For recruiters, load the live relational data
+    const { data: theme } = await supabase
+      .from('company_themes')
+      .select('*')
+      .eq('company_id', company.id)
+      .single()
+
+    const { data: allSections } = await supabase
+      .from('company_sections')
+      .select('*')
+      .eq('company_id', company.id)
+      .order('sort_order', { ascending: true })
+      
+    themeData = theme;
+    allSectionsData = allSections || [];
+
+    // Check if live data differs from published snapshot
+    if (company.is_published && company.published_data) {
+      // Create omit-based comparisons to ignore transient fields like updated_at if necessary
+      // For now, doing a basic string compare of the core fields helps catch differences.
+      const snapshotTheme = company.published_data.theme;
+      const snapshotSections = company.published_data.sections;
+      if (
+        JSON.stringify(snapshotTheme) !== JSON.stringify(themeData) ||
+        JSON.stringify(snapshotSections) !== JSON.stringify(allSectionsData)
+      ) {
+        hasUnpublishedChanges = true;
+      }
+    }
+  } else {
+    // For public visitors, load from the published snapshot if it exists
+    if (company.published_data) {
+      themeData = company.published_data.theme || null;
+      allSectionsData = company.published_data.sections || [];
+    }
+  }
+
   // Get visible sections for public view
-  const visibleSections = (allSections || []).filter(s => s.is_visible)
+  const visibleSections = allSectionsData.filter(s => s.is_visible)
 
   return (
     <EditableCareersLayout
       company={company}
-      theme={theme}
-      allSections={allSections || []}
+      theme={themeData}
+      allSections={allSectionsData}
       visibleSections={visibleSections}
       jobs={jobs || []}
       isRecruiter={isRecruiter}
       currentUserId={user?.id}
+      hasUnpublishedChanges={hasUnpublishedChanges}
     />
   )
 }

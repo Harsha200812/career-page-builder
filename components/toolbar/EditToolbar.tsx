@@ -19,6 +19,7 @@ interface Props {
   saving: boolean
   lastSaved: Date | null
   isDirty: boolean
+  onPublish: () => void
   onLogout?: () => void
 }
 
@@ -34,6 +35,7 @@ export default function EditToolbar({
   saving,
   lastSaved,
   isDirty,
+  onPublish,
   onLogout,
 }: Props) {
   const [copied, setCopied] = useState(false)
@@ -59,15 +61,6 @@ export default function EditToolbar({
     }
   }
 
-  const handlePublishToggle = () => {
-    if (isPublished) {
-      if (confirm('Unpublish this page? Candidates will no longer be able to view it.')) {
-        onPublishToggle()
-      }
-    } else {
-      onPublishToggle()
-    }
-  }
 
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center gap-2 pointer-events-none">
@@ -185,25 +178,51 @@ export default function EditToolbar({
         </div>
 
         {/* Publish Action */}
-        <div className="pl-2 border-l border-slate-200 ml-1">
+        <div className="pl-2 border-l border-slate-200 ml-1 flex items-center gap-2">
+          {isPublished && (
+            <button
+              onClick={() => {
+                if (confirm('Unpublish this page? Candidates will no longer be able to view it.')) {
+                  onPublishToggle()
+                }
+              }}
+              disabled={saving}
+              className="px-4 py-2 rounded-full text-sm font-semibold text-slate-500 hover:text-red-600 hover:bg-red-50 transition-all"
+            >
+              Unpublish
+            </button>
+          )}
+
           <button
-            onClick={handlePublishToggle}
+            onClick={() => {
+              if (isDirty || !isPublished) {
+                if (confirm('Publish all draft changes to the public page?')) {
+                  onPublish()
+                }
+              }
+            }}
+            disabled={saving || (!isDirty && isPublished)}
             className={cn(
               "flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold transition-all shadow-sm",
-              isPublished 
-                ? "bg-emerald-500 text-white hover:bg-emerald-600"
+              !isDirty && isPublished
+                ? "bg-slate-100 text-slate-400 cursor-not-allowed"
                 : "bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-md hover:shadow-blue-500/20"
             )}
           >
-            {isPublished ? (
+            {saving ? (
               <>
-                <Globe className="w-4 h-4" />
-                <span className="hidden sm:inline">Published</span>
+                <RefreshCw className="w-4 h-4 animate-spin" />
+                <span className="hidden sm:inline">Publishing...</span>
+              </>
+            ) : (!isDirty && isPublished) ? (
+              <>
+                <Check className="w-4 h-4" />
+                <span className="hidden sm:inline">Up to Date</span>
               </>
             ) : (
               <>
-                <Lock className="w-4 h-4" />
-                <span className="hidden sm:inline">Publish</span>
+                <Globe className="w-4 h-4" />
+                <span className="hidden sm:inline">{isPublished ? 'Publish Changes' : 'Publish Page'}</span>
               </>
             )}
           </button>
